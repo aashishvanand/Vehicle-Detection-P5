@@ -19,8 +19,8 @@ Here are links to the labeled data for [vehicle](https://s3.amazonaws.com/udacit
 [//]: # (Image References)
 [image1]: ./output_images/car_hog.png
 [image2]: ./output_images/notcar_hog.png
-[image3]: ./examples/sliding_windows.jpg
-[image4]: ./examples/sliding_window.jpg
+[image3]: ./output_images/box_overlays.png
+[image4]: ./output_images/heatmap.png
 [image5]: ./examples/bboxes_and_heat.png
 [image6]: ./examples/labels_map.png
 [image7]: ./examples/output_bboxes.png
@@ -40,69 +40,64 @@ the same input parametrs is used in extract_features example using the `RGB` col
 ![alt text][image1]
 ![alt text][image2]
 
-
-I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
-
-Here is an example using the `YCrCb` color space and HOG parameters of `orientations=8`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
-
-
-![alt text][image2]
-
 ####2. Explain how you settled on your final choice of HOG parameters.
 
-I tried various combinations of parameters and...
+I tried various combinations of `skimage.hog()` and the best performance of HOG parametes was with `pixels_per_cell=(8, 8)`
+ `orientations=9`,  and `cells_per_block=(2, 2)` with `YCrCb` color space seems that best. 
+ 
+ http://waset.org/publications/10001883/a-background-subtraction-based-moving-object-detection-around-the-host-vehicle this paper too gives a better explanation on it.
 
 ####3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
-I trained a linear SVM using...
+The 10th cell in the ipynb i use a linear SVC to train the classifier which gave a stunning result of 0.9932% accuracy which is pretty decent. After extracting the HOG features with the colorspace and above explained parameters, combined with spatially binned color and histograms of color. Then I stack these features into a single numpy array. To avoid overfitting I split up data into randomized training and test sets with sklearn `train_test_split`.
 
 ###Sliding Window Search
 
 ####1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
 
-I decided to search random window positions at random scales all over the image and came up with this (ok just kidding I didn't actually ;):
-
-![alt text][image3]
+First of all, I only apply the sliding window on the bottom half of the image because the vehicles will not show above the road surface it was an excllent clue from the lesson which could have been easily overlooked. I tried different window size (search scale) and overlap rate, and found that window size 96 and overlap 0.5 works well. 
 
 ####2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
-Ultimately I searched on two scales using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
+![alt text][image3]
+I tried various combinations of YCrCb ALL-channel HOG features,spatially binned color and histograms of color. i varied the output with diffrent color space, and the HOG parameter.
 
-![alt text][image4]
 ---
 
 ### Video Implementation
 
 ####1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
-Here's a [link to my video result](./project_video.mp4)
+
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/43ia0BKZJjY/0.jpg)](https://www.youtube.com/watch?v=43ia0BKZJjY "Test Video ")
+
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/I0Uvo9OyVoc/0.jpg)](https://www.youtube.com/watch?v=I0Uvo9OyVoc "Result Video ")
 
 
 ####2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
 
-I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.  
-
-Here's an example result showing the heatmap from a series of frames of video, the result of `scipy.ndimage.measurements.label()` and the bounding boxes then overlaid on the last frame of video:
+I used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  we assumed each blob corresponded to a vehicle, and finally we draw bounding boxes to cover the area of each blob detected. The heat map is generated from the positions of positive detected cars from the trained classifer and by summing up and recorded the heatmap for 10 sequential frame and apply a threshold of 5. We get a new heatmap based on last generated positions
 
 ### Here are six frames and their corresponding heatmaps:
 
-![alt text][image5]
+![alt text][image4]
 
-### Here is the output of `scipy.ndimage.measurements.label()` on the integrated heatmap from all six frames:
-![alt text][image6]
-
-### Here the resulting bounding boxes are drawn onto the last frame in the series:
-![alt text][image7]
 ---
 
 ###Discussion
 
 ####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+To my own intrest i tried in a sample from a car recorded from Chennai, India. The issue was the model was trained only to identify cars it drastically failed in identifying 2-wheelers (0:29 sec) and pedestrians which i felt could be added to this project to make it a complete one. <br>
+There were lot of false positve in the video from (0:31) to (0:40) which might inturn in a real-time make a steering correction and might result in unwanted breaking and turning. <br>
+To my surprise the white car at (1:45) wasnt identifed which was right in front most of the time. Cars very close to the dashcam failed to identify <br>
+
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/ntggVyuKGsc/0.jpg)](https://www.youtube.com/watch?v=ntggVyuKGsc "Chennai Video ")
+
+To optimize the algorithm i felt we already know which lane the car is in using previous projects. we can use this algo only for calcualting cars in the adjacent lanes only. instead of the whole frame. <br>
+
+The algorithm will fail in a downhill traffic. where the opposite side car might be in the top left or right of the windshield. we might not even consider that case in this algorithm.<br>
+
+The algo might also suffer when there is a bridge a short road (flat) and another bridge. when our car is in the bridge (downstream) and if there is any car in the short road that will not be seen. similarly when our car is in flatroad and if there is another car climbing that might also be missed <br>
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/513/view) Points
-###Here I will consider the rubric points individually and describe how I addressed each point in my implementation. 
-
-**As an optional challenge** Once you have a working pipeline for vehicle detection, add in your lane-finding algorithm from the last project to do simultaneous lane-finding and vehicle detection!
-
-**If you're feeling ambitious** (also totally optional though), don't stop there!  We encourage you to go out and take video of your own, and show us how you would implement this project on a new video!
+###Here I will consider the rubric points individually and describe how I addressed each point in my implementation. !
