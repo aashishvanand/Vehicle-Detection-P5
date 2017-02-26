@@ -19,12 +19,8 @@ Here are links to the labeled data for [vehicle](https://s3.amazonaws.com/udacit
 [//]: # (Image References)
 [image1]: ./output_images/car_hog.png
 [image2]: ./output_images/notcar_hog.png
-[image3]: ./output_images/box_overlays.png
+[image3]: ./output_images/box_overlay.png
 [image4]: ./output_images/heatmap.png
-[image5]: ./examples/bboxes_and_heat.png
-[image6]: ./examples/labels_map.png
-[image7]: ./examples/output_bboxes.png
-[video1]: ./project_video.mp4
 
 ###Histogram of Oriented Gradients (HOG)
 
