@@ -17,8 +17,8 @@ The goals / steps of this project are the following:
 Here are links to the labeled data for [vehicle](https://s3.amazonaws.com/udacity-sdc/Vehicle_Tracking/vehicles.zip) and [non-vehicle](https://s3.amazonaws.com/udacity-sdc/Vehicle_Tracking/non-vehicles.zip) examples to train your classifier.  These example images come from a combination of the [GTI vehicle image database](http://www.gti.ssr.upm.es/data/Vehicle_database.html), the [KITTI vision benchmark suite](http://www.cvlibs.net/datasets/kitti/), and examples extracted from the project video itself.   You are welcome and encouraged to take advantage of the recently released [Udacity labeled dataset](https://github.com/udacity/self-driving-car/tree/master/annotations) to augment your training data.  
 
 [//]: # (Image References)
-[image1]: ./examples/car_not_car.png
-[image2]: ./examples/HOG_example.jpg
+[image1]: ./output_images/car_hog.png
+[image2]: ./output_images/notcar_hog.png
 [image3]: ./examples/sliding_windows.jpg
 [image4]: ./examples/sliding_window.jpg
 [image5]: ./examples/bboxes_and_heat.png
@@ -30,11 +30,16 @@ Here are links to the labeled data for [vehicle](https://s3.amazonaws.com/udacit
 
 ####1. Explain how (and identify where in your code) you extracted HOG features from the training images.
 
-The code for this step is contained in the first code cell of the IPython notebook (or in lines # through # of the file called `some_file.py`).  
+extract_features() is the function that is used to extract features from a list of images. It calls call bin_spatial() and color_hist()
+bin_spatial() is used to resize the image to 32x32 using cv2.resize and create features vector. it takes a bin_spatial(img, size=(32, 32)): and returns a return np.hstack((features0,features1,features2)). def color_hist(img, nbins=32) takes in image and returns returns indivuaial histograms and bincenters as concatenated values. 
 
-I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an example of one of each of the `vehicle` and `non-vehicle` classes:
+the same slimdown version for illustrative purpose is single_img_features() which takes in single image instead of multiple images. it takes in (image, colorspace "rgb" or "hsv" or "luv" or "hls" or "yuv" or "YCrCb", spatial size which is 32*32, orientation is 9, pixel per cell is 8 with 2 cells per block and 32 histogram bins 
+
+the same input parametrs is used in extract_features example using the `RGB` color space and HOG parameters of `orientations=9`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
 
 ![alt text][image1]
+![alt text][image2]
+
 
 I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
 
