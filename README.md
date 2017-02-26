@@ -94,6 +94,3 @@ To optimize the algorithm i felt we already know which lane the car is in using 
 The algorithm will fail in a downhill traffic. where the opposite side car might be in the top left or right of the windshield. we might not even consider that case in this algorithm.<br>
 
 The algo might also suffer when there is a bridge a short road (flat) and another bridge. when our car is in the bridge (downstream) and if there is any car in the short road that will not be seen. similarly when our car is in flatroad and if there is another car climbing that might also be missed <br>
-
-## [Rubric](https://review.udacity.com/#!/rubrics/513/view) Points
-###Here I will consider the rubric points individually and describe how I addressed each point in my implementation. !
